@@ -6,7 +6,7 @@ interface TodoItem {
   done: boolean
 }
 
-type Theme = 'light' | 'eye' | 'dark'
+type Theme = 'light' | 'dark'
 
 const noteAPI = {
   getNote: (noteId: string): Promise<any> => ipcRenderer.invoke('note:get', noteId),

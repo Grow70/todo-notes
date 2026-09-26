@@ -26,7 +26,7 @@ interface NoteData {
 }
 
 interface Settings {
-  theme: 'light' | 'eye' | 'dark'
+  theme: 'light' | 'dark'
 }
 
 type Theme = Settings['theme']
@@ -82,7 +82,7 @@ function loadSettings(): void {
   try {
     if (existsSync(settingsFile)) {
       const parsed = JSON.parse(readFileSync(settingsFile, 'utf-8'))
-      if (parsed && ['light', 'eye', 'dark'].includes(parsed.theme)) {
+      if (parsed && ['light', 'dark'].includes(parsed.theme)) {
         settings.theme = parsed.theme
       }
     }
@@ -267,7 +267,7 @@ function registerIpc(): void {
   ipcMain.handle('settings:get', () => settings)
 
   ipcMain.handle('settings:set-theme', (_e, theme: Theme) => {
-    if (!['light', 'eye', 'dark'].includes(theme)) return false
+    if (!['light', 'dark'].includes(theme)) return false
     settings.theme = theme
     saveSettings()
     broadcastTheme(theme)

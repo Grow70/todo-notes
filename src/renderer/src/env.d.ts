@@ -1,6 +1,6 @@
 export {}
 
-type Theme = 'light' | 'eye' | 'dark'
+type Theme = 'light' | 'dark'
 
 interface TodoItem {
   id: string

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-type Theme = 'light' | 'eye' | 'dark'
+type Theme = 'light' | 'dark'
 
 export interface TodoItem {
   id: string
