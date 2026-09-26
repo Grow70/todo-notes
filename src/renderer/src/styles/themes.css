@@ -1,0 +1,346 @@
+/* ---------- 主题变量 ---------- */
+.note-root[data-theme='light'] {
+  --bg: #ffffff;
+  --bg-elevated: #f7f8fa;
+  --text: #1f2329;
+  --muted: #8a919b;
+  --accent: #4a7dff;
+  --border: #eceef2;
+  --hover: #f2f4f7;
+  --shadow: 0 10px 30px rgba(31, 35, 41, 0.18);
+  --input-bg: #f2f4f7;
+}
+
+.note-root[data-theme='eye'] {
+  --bg: #cfe8d5;
+  --bg-elevated: #c2dfc9;
+  --text: #2f3b33;
+  --muted: #7c8f83;
+  --accent: #4c9a63;
+  --border: #b7d4be;
+  --hover: #bcdcc4;
+  --shadow: 0 10px 30px rgba(47, 59, 51, 0.22);
+  --input-bg: #c2dfc9;
+}
+
+.note-root[data-theme='dark'] {
+  --bg: #2a2d34;
+  --bg-elevated: #33373f;
+  --text: #e6e8eb;
+  --muted: #9aa0aa;
+  --accent: #6c8cff;
+  --border: #3d424c;
+  --hover: #363b45;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --input-bg: #363b45;
+}
+
+/* ---------- 基础布局 ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  padding: 12px; /* 为阴影留出空间 */
+  background: transparent;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+.note-root {
+  height: 100%;
+  width: 100%;
+}
+
+.note-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* ---------- 头部（拖动区） ---------- */
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px 12px 14px;
+  -webkit-app-region: drag;
+}
+
+.note-title {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  outline: none;
+  -webkit-app-region: no-drag;
+}
+
+.note-title::placeholder {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  gap: 2px;
+  -webkit-app-region: no-drag;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.icon-btn.active {
+  color: var(--accent);
+  background: var(--hover);
+}
+
+.icon-btn.danger:hover {
+  color: #e5534b;
+}
+
+/* ---------- 待办列表 ---------- */
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px;
+}
+
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+.empty-hint {
+  padding: 16px 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  transition: background 0.15s ease;
+}
+
+.todo-item:hover {
+  background: var(--hover);
+}
+
+.check {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.check svg {
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.todo-item.done .check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.todo-item.done .check svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.todo-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.todo-item.done .todo-text {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.todo-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.todo-item:hover .todo-delete {
+  opacity: 1;
+}
+
+.todo-delete:hover {
+  background: var(--bg-elevated);
+  color: #e5534b;
+}
+
+/* ---------- 添加待办 ---------- */
+.add-todo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 6px;
+  border-top: 1px solid var(--border);
+}
+
+.add-input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 9px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: background 0.15s ease;
+}
+
+.add-input::placeholder {
+  color: var(--muted);
+}
+
+.add-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.add-btn:hover {
+  opacity: 0.88;
+}
+
+/* ---------- 底部 ---------- */
+.note-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px 10px;
+}
+
+.theme-switch {
+  display: flex;
+  gap: 6px;
+}
+
+.theme-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.theme-dot:hover {
+  transform: scale(1.15);
+}
+
+.theme-dot.selected {
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+.counter {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 缩放热区（透明窗口不支持原生缩放） ---------- */
+.resize-handle {
+  position: fixed;
+  z-index: 100;
+}
+
+.rh-n { top: 0; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.rh-s { bottom: 0; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+.rh-e { right: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.rh-w { left: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+.rh-ne { top: 0; right: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+.rh-nw { top: 0; left: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+.rh-se { bottom: 0; right: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+.rh-sw { bottom: 0; left: 0; width: 14px; height: 14px; cursor: nesw-resize; }
