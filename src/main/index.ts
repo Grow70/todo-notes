@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, screen } from 'electron'
+import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, screen, globalShortcut } from 'electron'
 import { join } from 'path'
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { randomUUID } from 'crypto'
@@ -190,11 +190,7 @@ function createNoteWindow(note: NoteData): BrowserWindow {
 
   win.on('closed', () => {
     windows.delete(note.id)
-    // 非退出流程下的关闭 = 删除该便签
-    if (!isQuitting) {
-      notes = notes.filter((n) => n.id !== note.id)
-      saveNotes()
-    }
+    // 关闭窗口仅隐藏便签，数据保留；只有点击「删除便签」按钮才真正删除
   })
 
   return win
@@ -346,7 +342,7 @@ function createTray(): void {
   ])
   tray.setContextMenu(menu)
   tray.on('click', () => {
-    if (windows.size === 0) {
+    if (notes.length === 0) {
       createNoteWindow(createBlankNote())
     } else {
       showAllWindows()
@@ -368,6 +364,12 @@ function createBlankNote(): NoteData {
 }
 
 function showAllWindows(): void {
+  // 为已关闭窗口的便签重建窗口
+  for (const note of notes) {
+    if (!windows.has(note.id)) {
+      createNoteWindow(note)
+    }
+  }
   for (const win of windows.values()) {
     if (!win.isDestroyed()) {
       if (win.isMinimized()) win.restore()
@@ -377,10 +379,34 @@ function showAllWindows(): void {
   }
 }
 
+function registerGlobalShortcut(): void {
+  const accelerator = 'CommandOrControl+Alt+N'
+  const ok = globalShortcut.register(accelerator, () => {
+    if (notes.length === 0) {
+      createNoteWindow(createBlankNote())
+    } else {
+      showAllWindows()
+    }
+  })
+  if (!ok) {
+    console.error('全局快捷键注册失败：', accelerator)
+  }
+}
+
 function quitApp(): void {
   isQuitting = true
   app.quit()
 }
+
+// ---------- 单实例锁：双击再次启动时聚焦已有实例 ----------
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+}
+
+app.on('second-instance', () => {
+  if (notes.length === 0) createNoteWindow(createBlankNote())
+  else showAllWindows()
+})
 
 // ---------- 应用生命周期 ----------
 app.whenReady().then(() => {
@@ -392,6 +418,7 @@ app.whenReady().then(() => {
   } catch (err) {
     console.error('创建托盘失败：', err)
   }
+  registerGlobalShortcut()
 
   // 恢复所有已保存的便签；首次启动则自动创建一个引导便签
   if (notes.length === 0) {
@@ -408,8 +435,9 @@ app.whenReady().then(() => {
   }
 
   app.on('activate', () => {
-    // macOS 点击 Dock 时，若没有窗口则新建一个
-    if (windows.size === 0) createNoteWindow(createBlankNote())
+    // macOS 点击 Dock 时，若无便签则新建，否则显示全部
+    if (notes.length === 0) createNoteWindow(createBlankNote())
+    else showAllWindows()
   })
 })
 
@@ -420,4 +448,5 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
   isQuitting = true
+  globalShortcut.unregisterAll()
 })
